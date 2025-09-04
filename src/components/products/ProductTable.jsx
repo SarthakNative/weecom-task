@@ -36,10 +36,10 @@ const ProductTable = () => {
     try {
       if (editingProduct) {
         await updateMutation.mutateAsync(formData);
-        showMessage('success', 'Product updated successfully!');
+        showMessage('success', `"${formData.title}" updated successfully!`);
       } else {
         await createMutation.mutateAsync(formData);
-        showMessage('success', 'Product created successfully!');
+        showMessage('success', `"${formData.title}" created successfully!`);
       }
       setIsFormOpen(false);
       setEditingProduct(null);
@@ -53,7 +53,7 @@ const ProductTable = () => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
       try {
         await deleteMutation.mutateAsync(id);
-        showMessage('success', 'Product deleted successfully!');
+        showMessage('success', `"${title}" deleted successfully!`);
       } catch (error) {
         console.error('Error deleting product:', error);
         showMessage('error', 'Error deleting product. Please try again.');
@@ -136,9 +136,26 @@ const ProductTable = () => {
             </thead>
             <tbody>
               {products.map(product => (
-                <tr key={product.id} className="border-b hover:bg-gray-50">
+                <tr 
+                  key={product.id} 
+                  className={`border-b hover:bg-gray-50 ${
+                    product.isNew 
+                      ? 'bg-green-50 border-green-200' 
+                      : product.isUpdated 
+                      ? 'bg-blue-50 border-blue-200' 
+                      : ''
+                  }`}
+                >
                   <td className="py-2 px-4">
-                    <div className="font-medium">{product.title}</div>
+                    <div className="font-medium flex items-center gap-2">
+                      {product.title}
+                      {product.isNew && (
+                        <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">NEW</span>
+                      )}
+                      {product.isUpdated && (
+                        <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">UPDATED</span>
+                      )}
+                    </div>
                   </td>
                   <td className="py-2 px-4">
                     <div className="font-semibold text-green-600">
@@ -187,7 +204,7 @@ const ProductTable = () => {
           </table>
         </div>
         
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
           <div className="text-sm text-gray-500">
             Showing {skip + 1} to {Math.min(skip + limit, total)} of {total} products
           </div>
@@ -224,6 +241,13 @@ const ProductTable = () => {
           {message.text}
         </div>
       )}
+      
+      {/* Demo Notice */}
+      <div className="mx-6 mt-6 p-3 rounded-md bg-blue-100 text-blue-800 border border-blue-200">
+        <div className="text-sm">
+          <strong>Demo Mode:</strong> This uses DummyJSON (mock API). All CRUD operations work but only persist in your browser session.
+        </div>
+      </div>
       
       {/* Header is always visible */}
       <CardHeader>
