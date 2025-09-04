@@ -43,16 +43,6 @@ https://weecom-task.vercel.app/
 
 ### 4. **Component Structure Design**
 
-src/
-├── components/
-│ ├── ui/ (shadcn/ui components)
-│ ├── layout/ (Header, Sidebar)
-│ └── products/ (ProductTable, ProductForm, Skeleton)
-├── hooks/ (useProducts, useCategories, mutations)
-├── services/ (API layer)
-└── lib/ (utilities)
-
-
 ### 5. **CRUD Operations Implementation**
 - **Read**: Fetched products with pagination and search
 - **Create**: Added form validation and optimistic updates
