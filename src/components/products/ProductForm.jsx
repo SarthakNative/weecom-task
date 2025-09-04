@@ -13,7 +13,6 @@ const ProductForm = ({ product, isOpen, onClose, onSubmit, isLoading }) => {
 
   const [errors, setErrors] = useState({});
 
-  // Update form data when product prop changes
   useEffect(() => {
     if (product) {
       setFormData({
@@ -83,7 +82,6 @@ const ProductForm = ({ product, isOpen, onClose, onSubmit, isLoading }) => {
       [name]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,

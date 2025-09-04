@@ -24,7 +24,6 @@ const ProductTable = () => {
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
 
-  // Show success/error messages
   const showMessage = (type, text) => {
     setMessage({ type, text });
     setTimeout(() => setMessage({ type: '', text: '' }), 5000);
@@ -82,7 +81,6 @@ const ProductTable = () => {
   const products = data?.products || [];
   const total = data?.total || 0;
 
-  // Render content based on loading, error, and data states
   const renderContent = () => {
     if (isLoading) {
       return <ProductTableSkeleton />;
@@ -146,71 +144,74 @@ const ProductTable = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map(product => (
-                <tr 
-                  key={product.id} 
-                  className={`border-b hover:bg-gray-50 ${
-                    product.isNew 
-                      ? 'bg-green-50 border-green-200' 
-                      : product.isUpdated 
-                      ? 'bg-blue-50 border-blue-200' 
-                      : ''
-                  }`}
-                >
-                  <td className="py-2 px-4">
-                    <div className="font-medium flex items-center gap-2">
-                      {product.title}
-                      {product.isNew && (
-                        <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">NEW</span>
-                      )}
-                      {product.isUpdated && (
-                        <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">UPDATED</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-2 px-4">
-                    <div className="font-semibold text-green-600">
-                      ${product.price}
-                    </div>
-                  </td>
-                  <td className="py-2 px-4">
-                    <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
-                      {product.category}
-                    </span>
-                  </td>
-                  <td className="py-2 px-4">
-                    <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                      product.stock > 10 
-                        ? 'bg-green-100 text-green-800' 
-                        : product.stock > 0 
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {product.stock} units
-                    </span>
-                  </td>
-                  <td className="py-2 px-4">
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        onClick={() => handleEdit(product)}
-                        disabled={deleteMutation.isPending}
-                      >
-                        Edit
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="destructive" 
-                        onClick={() => handleDelete(product.id, product.title)}
-                        disabled={deleteMutation.isPending}
-                      >
-                        {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+             {products.map(product => (
+  <tr 
+    key={product.id} 
+    className={`border-b hover:bg-gray-50 ${
+      product.isNew 
+        ? 'bg-green-50 border-green-200' 
+        : product.isUpdated 
+        ? 'bg-blue-50 border-blue-200' 
+        : ''
+    }`}
+  >
+    <td className="py-2 px-4">
+      <div className="font-medium flex items-center gap-2">
+        {product.title}
+        {product.isNew && (
+          <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">NEW</span>
+        )}
+        {product.isUpdated && (
+          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">UPDATED</span>
+        )}
+        {product.isCustom && (
+          <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded">CUSTOM</span>
+        )}
+      </div>
+    </td>
+    <td className="py-2 px-4">
+      <div className="font-semibold text-green-600">
+        ${product.price}
+      </div>
+    </td>
+    <td className="py-2 px-4">
+      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+        {product.category}
+      </span>
+    </td>
+    <td className="py-2 px-4">
+      <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+        product.stock > 10 
+          ? 'bg-green-100 text-green-800' 
+          : product.stock > 0 
+          ? 'bg-yellow-100 text-yellow-800'
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {product.stock} units
+      </span>
+    </td>
+    <td className="py-2 px-4">
+      <div className="flex gap-2">
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={() => handleEdit(product)}
+          disabled={deleteMutation.isPending}
+        >
+          Edit
+        </Button>
+        <Button 
+          size="sm" 
+          variant="destructive" 
+          onClick={() => handleDelete(product.id, product.title)}
+          disabled={deleteMutation.isPending}
+        >
+          {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+        </Button>
+      </div>
+    </td>
+  </tr>
+))}
             </tbody>
           </table>
         </div>
@@ -245,7 +246,6 @@ const ProductTable = () => {
 
   return (
     <Card>
-      {/* Success/Error Message */}
       {message.text && (
         <div className={`mx-6 mt-6 p-3 rounded-md ${
           message.type === 'success' 
@@ -256,14 +256,6 @@ const ProductTable = () => {
         </div>
       )}
       
-      {/* Demo Notice */}
-      <div className="mx-6 mt-6 p-3 rounded-md bg-blue-100 text-blue-800 border border-blue-200">
-        <div className="text-sm">
-          <strong>Demo Mode:</strong> This uses DummyJSON (mock API). All CRUD operations work but only persist in your browser session.
-        </div>
-      </div>
-      
-      {/* Header is always visible */}
       <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <CardTitle className="flex items-center gap-2">
@@ -280,7 +272,6 @@ const ProductTable = () => {
             )}
           </CardTitle>
           
-          {/* Category Filter and Add Product Button */}
           <div className="flex items-center gap-3">
             <Select value={category} onValueChange={handleCategoryFilter}>
               <SelectTrigger className="w-[180px]">
@@ -301,8 +292,7 @@ const ProductTable = () => {
             </Button>
           </div>
         </div>
-        
-        {/* Search Input */}
+
         <div className="flex gap-4">
           <Input
             placeholder="Search products..."
@@ -326,7 +316,6 @@ const ProductTable = () => {
         </div>
       </CardHeader>
       
-      {/* Content area that shows loading/error/data */}
       <CardContent>
         {renderContent()}
 

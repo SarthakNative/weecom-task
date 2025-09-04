@@ -4,7 +4,6 @@ import { Skeleton } from '../ui/skeleton';
 const ProductTableSkeleton = () => {
   return (
     <div className="space-y-4">
-      {/* Table Header Skeleton */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
@@ -27,7 +26,6 @@ const ProductTableSkeleton = () => {
             </tr>
           </thead>
           <tbody>
-            {/* Generate 5 skeleton rows */}
             {Array.from({ length: 5 }).map((_, index) => (
               <tr key={index} className="border-b">
                 <td className="py-2 px-4">
@@ -54,7 +52,6 @@ const ProductTableSkeleton = () => {
         </table>
       </div>
       
-      {/* Pagination Skeleton */}
       <div className="flex justify-between items-center mt-4">
         <Skeleton className="h-4 w-48" />
         <div className="flex gap-2">

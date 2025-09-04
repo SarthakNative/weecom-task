@@ -1,12 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productsApi } from '../services/api';
 
-// This will store our client-side modifications
 let clientSideProducts = [];
 let allCategories = [];
 let nextId = 1000;
 
-// Initialize with DummyJSON data on first load
 const initializeData = async () => {
   if (clientSideProducts.length === 0) {
     try {
@@ -19,14 +17,16 @@ const initializeData = async () => {
   }
 };
 
+const isCustomProduct = (id) => {
+  return id >= 1000; 
+};
+
 export const useProducts = (params = {}) => {
   return useQuery({
     queryKey: ['products', params],
     queryFn: async () => {
-      // Initialize data if needed
       await initializeData();
       
-      // Filter client-side products based on search and category
       let filteredProducts = [...clientSideProducts];
       
       if (params.search) {
@@ -42,7 +42,6 @@ export const useProducts = (params = {}) => {
         );
       }
       
-      // Apply pagination
       const paginatedProducts = filteredProducts.slice(
         params.skip || 0,
         (params.skip || 0) + (params.limit || 10)
@@ -76,7 +75,11 @@ export const useCreateProduct = () => {
   
   return useMutation({
     mutationFn: async (product) => {
-      const response = await productsApi.createProduct(product);
+      try {
+        await productsApi.createProduct(product);
+      } catch (error) {
+        console.log('API call failed (expected for demo), continuing with client-side operation');
+      }
       
       const newProduct = {
         id: nextId++,
@@ -89,12 +92,12 @@ export const useCreateProduct = () => {
         thumbnail: 'https://via.placeholder.com/150',
         rating: 4.5,
         discountPercentage: 0,
-        isNew: true
+        isNew: true,
+        isCustom: true 
       };
       
       clientSideProducts.unshift(newProduct);
       
-      // Update categories if new category
       if (!allCategories.includes(product.category)) {
         allCategories.push(product.category);
         allCategories.sort();
@@ -102,9 +105,13 @@ export const useCreateProduct = () => {
       
       return { data: newProduct };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Product created successfully:', data.data);
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+    onError: (error) => {
+      console.error('Error creating product:', error);
     },
   });
 };
@@ -114,7 +121,15 @@ export const useUpdateProduct = () => {
   
   return useMutation({
     mutationFn: async ({ id, ...product }) => {
-      await productsApi.updateProduct(id, product);
+      if (!isCustomProduct(id)) {
+        try {
+          await productsApi.updateProduct(id, product);
+        } catch (error) {
+          console.log('API update failed for original product:', error);
+        }
+      } else {
+        console.log('Updating custom product (client-side only):', id);
+      }
       
       const index = clientSideProducts.findIndex(p => p.id === id);
       if (index !== -1) {
@@ -128,18 +143,23 @@ export const useUpdateProduct = () => {
           isUpdated: true
         };
         
-        // Update categories if category changed
         if (oldCategory !== product.category && !allCategories.includes(product.category)) {
           allCategories.push(product.category);
           allCategories.sort();
         }
+        
+        return { data: clientSideProducts[index] };
       }
       
-      return { data: clientSideProducts[index] };
+      throw new Error('Product not found');
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      console.log('Product updated successfully:', data.data);
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+    onError: (error) => {
+      console.error('Error updating product:', error);
     },
   });
 };
@@ -149,13 +169,31 @@ export const useDeleteProduct = () => {
   
   return useMutation({
     mutationFn: async (id) => {
-      await productsApi.deleteProduct(id);
-      clientSideProducts = clientSideProducts.filter(p => p.id !== id);
-      return { data: { id, isDeleted: true } };
+      if (!isCustomProduct(id)) {
+        try {
+          await productsApi.deleteProduct(id);
+        } catch (error) {
+          console.log('API delete failed for original product:', error);
+        }
+      } else {
+        console.log('Deleting custom product (client-side only):', id);
+      }
+      
+      const productExists = clientSideProducts.find(p => p.id === id);
+      if (productExists) {
+        clientSideProducts = clientSideProducts.filter(p => p.id !== id);
+        return { data: { id, isDeleted: true } };
+      }
+      
+      throw new Error('Product not found');
     },
-    onSuccess: () => {
+    onSuccess: (data, productId) => {
+      console.log('Product deleted successfully:', data.data);
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+    onError: (error) => {
+      console.error('Error deleting product:', error);
     },
   });
 };
@@ -163,4 +201,5 @@ export const useDeleteProduct = () => {
 export const resetClientStore = () => {
   clientSideProducts = [];
   allCategories = [];
+  nextId = 1000;
 };

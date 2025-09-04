@@ -6,7 +6,6 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
-// Add response interceptor to handle API responses
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -25,7 +24,6 @@ export const productsApi = {
   },
   
   createProduct: (product) => {
-    // DummyJSON expects specific format for adding products
     return api.post('/products/add', {
       title: product.title,
       price: Number(product.price),
@@ -38,7 +36,6 @@ export const productsApi = {
   },
   
   updateProduct: (id, product) => {
-    // DummyJSON expects specific format for updating products
     return api.put(`/products/${id}`, {
       title: product.title,
       price: Number(product.price),
