@@ -1,70 +1,92 @@
-# Getting Started with Create React App
+# Product Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React-based product dashboard using DummyJSON API with CRUD operations, search, and filtering capabilities.
 
-## Available Scripts
+## 🚀 Live Demo
+https://weecom-task.vercel.app/
 
-In the project directory, you can run:
+## 📋 Features
 
-### `npm start`
+- **Product Management**: Full CRUD operations (Create, Read, Update, Delete)
+- **Search & Filter**: Real-time search and category-based filtering
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Loading States**: Skeleton loaders and proper error handling
+- **Client-side Persistence**: Custom products persist during browser session
+- **Visual Feedback**: Success/error messages and operation indicators
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🛠️ Libraries Used
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **React** - Frontend framework
+- **TailwindCSS** - Utility-first CSS framework
+- **shadcn/ui** - Modern UI components (Card, Dialog, Button, Input, Select, Skeleton)
+- **TanStack Query (React Query)** - Data fetching and state management
+- **Axios** - HTTP client for API requests
+- **Radix UI** - Headless UI primitives
+- **Lucide React** - Icon library
 
-### `npm test`
+## 🏗️ My Approach
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 1. **Project Foundation**
+- Set up React app with Create React App
+- Configured TailwindCSS with custom design tokens
+- Integrated shadcn/ui component system for consistent UI
 
-### `npm run build`
+### 2. **API Integration Strategy**
+- Created centralized API service using Axios
+- Implemented DummyJSON API integration for initial data
+- Added response interceptors for error handling
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 3. **State Management Architecture**
+- Implemented TanStack Query for server state management
+- Created custom hooks for products and categories
+- Added caching and background refetching capabilities
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 4. **Component Structure Design**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+src/
+├── components/
+│ ├── ui/ (shadcn/ui components)
+│ ├── layout/ (Header, Sidebar)
+│ └── products/ (ProductTable, ProductForm, Skeleton)
+├── hooks/ (useProducts, useCategories, mutations)
+├── services/ (API layer)
+└── lib/ (utilities)
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 5. **CRUD Operations Implementation**
+- **Read**: Fetched products with pagination and search
+- **Create**: Added form validation and optimistic updates
+- **Update**: Pre-filled forms with existing data
+- **Delete**: Confirmation dialogs and immediate UI updates
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 6. **Search & Filter System**
+- Implemented real-time search across product titles and categories
+- Added dropdown category filter with dynamic options
+- Combined search and filter with pagination
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 7. **Client-Side Persistence Solution**
+**Challenge**: DummyJSON is a mock API - custom products don't persist
+**Solution**: 
+- Hybrid approach: Server data + client-side storage
+- Custom products (ID ≥ 1000) handled purely client-side
+- Original products (ID < 1000) use API + client-side fallback
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 8. **User Experience Enhancements**
+- Added skeleton loading states for better perceived performance
+- Implemented success/error toast messages
+- Visual indicators for new, updated, and custom products
+- Responsive design with mobile-first approach
 
-## Learn More
+### 9. **Error Handling & Edge Cases**
+- Graceful API error handling with fallback states
+- Empty state management for no results
+- Loading state management during operations
+- Form validation with real-time feedback
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 10. **Performance Optimizations**
+- React Query caching to minimize API calls
+- Optimistic updates for immediate UI feedback
+- Debounced search to reduce unnecessary requests
+- Efficient re-renders with proper dependency arrays
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
