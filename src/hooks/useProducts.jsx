@@ -13,17 +13,23 @@ export const useProducts = (params = {}) => {
       const serverProducts = response.data.products;
       
       // If this is the first load, initialize our client-side store
-      if (clientSideProducts.length === 0 && params.skip === 0 && !params.search) {
+      if (clientSideProducts.length === 0 && params.skip === 0 && !params.search && !params.category) {
         clientSideProducts = [...serverProducts];
       }
       
-      // Filter client-side products based on search
+      // Filter client-side products based on search and category
       let filteredProducts = [...clientSideProducts];
       
       if (params.search) {
-        filteredProducts = clientSideProducts.filter(product =>
+        filteredProducts = filteredProducts.filter(product =>
           product.title.toLowerCase().includes(params.search.toLowerCase()) ||
           product.category.toLowerCase().includes(params.search.toLowerCase())
+        );
+      }
+      
+      if (params.category && params.category !== 'all') {
+        filteredProducts = filteredProducts.filter(product =>
+          product.category.toLowerCase() === params.category.toLowerCase()
         );
       }
       
@@ -42,6 +48,19 @@ export const useProducts = (params = {}) => {
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 2,
+  });
+};
+
+// Hook to get unique categories
+export const useCategories = () => {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: () => {
+      const uniqueCategories = [...new Set(clientSideProducts.map(product => product.category))];
+      return uniqueCategories.sort();
+    },
+    enabled: clientSideProducts.length > 0,
+    staleTime: Infinity, // Categories don't change often
   });
 };
 
@@ -74,6 +93,7 @@ export const useCreateProduct = () => {
     onSuccess: (data) => {
       console.log('Product created successfully:', data.data);
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
     onError: (error) => {
       console.error('Error creating product:', error);
@@ -107,6 +127,7 @@ export const useUpdateProduct = () => {
     onSuccess: (data, variables) => {
       console.log('Product updated successfully:', data.data);
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
     onError: (error) => {
       console.error('Error updating product:', error);
@@ -130,6 +151,7 @@ export const useDeleteProduct = () => {
     onSuccess: (data, productId) => {
       console.log('Product deleted successfully:', data.data);
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
     onError: (error) => {
       console.error('Error deleting product:', error);

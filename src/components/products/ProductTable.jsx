@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import ProductForm from './ProductForm';
 import ProductTableSkeleton from './ProductTableSkeleton';
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '../../hooks/useProducts';
+import { useProducts, useCategories, useCreateProduct, useUpdateProduct, useDeleteProduct } from '../../hooks/useProducts';
 
 const ProductTable = () => {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -16,7 +18,8 @@ const ProductTable = () => {
   const limit = 10;
   const skip = page * limit;
 
-  const { data, isLoading, error } = useProducts({ limit, skip, search });
+  const { data, isLoading, error } = useProducts({ limit, skip, search, category });
+  const { data: categories } = useCategories();
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
@@ -29,6 +32,11 @@ const ProductTable = () => {
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
+    setPage(0);
+  };
+
+  const handleCategoryFilter = (selectedCategory) => {
+    setCategory(selectedCategory);
     setPage(0);
   };
 
@@ -107,12 +115,15 @@ const ProductTable = () => {
         <div className="text-center py-8 text-gray-500">
           <div className="mb-2">📦</div>
           <div className="font-medium">
-            {search ? 'No products found' : 'No products available'}
+            {search || category !== 'all' ? 'No products found' : 'No products available'}
           </div>
           <div className="text-sm mt-1">
-            {search ? 'Try adjusting your search terms' : 'Start by adding your first product'}
+            {search || category !== 'all' 
+              ? 'Try adjusting your search terms or filters' 
+              : 'Start by adding your first product'
+            }
           </div>
-          {!search && (
+          {!search && category === 'all' && (
             <Button onClick={handleAddNew} className="mt-4">
               Add Your First Product
             </Button>
@@ -207,6 +218,9 @@ const ProductTable = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
           <div className="text-sm text-gray-500">
             Showing {skip + 1} to {Math.min(skip + limit, total)} of {total} products
+            {category !== 'all' && (
+              <span className="ml-1">in "{category}"</span>
+            )}
           </div>
           <div className="flex gap-2">
             <Button 
@@ -265,10 +279,30 @@ const ProductTable = () => {
               </span>
             )}
           </CardTitle>
-          <Button onClick={handleAddNew} disabled={isLoading}>
-            Add Product
-          </Button>
+          
+          {/* Category Filter and Add Product Button */}
+          <div className="flex items-center gap-3">
+            <Select value={category} onValueChange={handleCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories?.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button onClick={handleAddNew} disabled={isLoading}>
+              Add Product
+            </Button>
+          </div>
         </div>
+        
+        {/* Search Input */}
         <div className="flex gap-4">
           <Input
             placeholder="Search products..."
@@ -276,6 +310,19 @@ const ProductTable = () => {
             onChange={handleSearch}
             className="max-w-sm"
           />
+          {(search || category !== 'all') && (
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setSearch('');
+                setCategory('all');
+                setPage(0);
+              }}
+              className="whitespace-nowrap"
+            >
+              Clear Filters
+            </Button>
+          )}
         </div>
       </CardHeader>
       
